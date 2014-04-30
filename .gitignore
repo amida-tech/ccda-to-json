@@ -3,6 +3,7 @@
 *.tmproj
 *~
 .project
+.settings
 *#
 .#*
 *.swp
