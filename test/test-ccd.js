@@ -25,7 +25,7 @@ describe('full ccd parser', function() {
     
     it('full deep check', function(done) {
         expect(ccd).to.exist;
-        var filepath  = path.join(__dirname, 'fixtures/json/CCD_1.json');
+        var filepath  = path.join(__dirname, 'fixtures/files/json/CCD_1.json');
         var json2Read = fs.readFileSync(filepath, 'utf-8');;
         var expectedCCD = JSON.parse(json2Read, function(key, value) {
             var reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/;
