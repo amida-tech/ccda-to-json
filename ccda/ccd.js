@@ -367,12 +367,6 @@ var CCDA = Component.define("CCDA")
 }).cleanupStep(Cleanup.fixSectionUris, 1);
 
 
-CCDA.prototype.run = function(node){
-  this.errors = [];
-  this.super_.run.apply(this, arguments);
-  return this;
-};
-
 module.exports = function(src, options, callback){
 
   if (arguments.length === 2){
@@ -395,6 +389,7 @@ module.exports = function(src, options, callback){
   ret.codes = []; // skip code resoution for now
   
   ret.src = src;
+  ret.errors = [];
   ret.run(xml);
 
   ret.cleanupTree(); // first build the data objects up 
