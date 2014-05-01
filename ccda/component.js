@@ -239,5 +239,9 @@ Component.prototype.getLinks = function(){
   return links;
 };
 
+Component
+.withNegationStatus(false)
+.cleanupStep(Cleanup.hideFields(["sourceIds"]), "paredown")
+.cleanupStep(Cleanup.clearNulls, "paredown");
 
 module.exports = Component;

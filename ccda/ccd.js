@@ -7,56 +7,7 @@ var OIDs = require("./oids");
 var Component = require("./component");
 var Cleanup = require("./cleanup");
 
-Component
-  .withNegationStatus(false)
-  .cleanupStep(Cleanup.hideFields(["sourceIds"]), "paredown")
-  .cleanupStep(Cleanup.clearNulls, "paredown");
-
-var Identifier = Component.define("Identifier")
-.fields([
-  ["root","1..1", "@root"],
-  ["extension","0..1", "@extension"],
-]);
-
-var TextWithReference = Component.define("TextWithReference");
-TextWithReference.fields([ 
-  ["text","0..*", "text()"],
-  ["reference","0..1", "./h:reference/@value"],
-])
-.cleanupStep(Cleanup.resolveReference);
-
-var ConceptDescriptor = Component.define("ConceptDescriptor");
-ConceptDescriptor.fields([ 
-  ["label","0..1", "@displayName"],
-  ["code","1..1", "@code"],
-  ["system","1..1", "@codeSystem"],
-  ["systemName","0..1", "@codeSystemName"],
-  ["nullFlavor","0..1", "@nullFlavor"],
-  ["translations","0..*", "h:translation", ConceptDescriptor],
-])
-.cleanupStep(Cleanup.validateShalls)
-.cleanupStep(Cleanup.augmentConcept)
-.cleanupStep(function(){
-  (this.js && this.js.system && delete this.js.system);
-}, "paredown");
-
-var SimpleCode = function(oid){
-  return Component.define("SimpleCode."+oid)
-  .fields([])
-  .cleanupStep(function(){
-    if (this.js) {
-      this.js = OIDs[oid].table[this.js];
-    }
-  }, "paredown");
-};
-
-var SimplifiedCode = ConceptDescriptor.define("SimpifiedCode")
-.cleanupStep(function(){
-  if (this.js) {
-  // TODO: look up; don't trust the label to be present...
-    this.js = this.js.label;
-  }
-});
+var shared = require('./shared');
 
 var Address = Component.define("Address")
 .fields([
@@ -65,7 +16,7 @@ var Address = Component.define("Address")
   ["state",         "0..1",   "h:state/text()"],
   ["zip",           "0..1",   "h:postalCode/text()"],
   ["country",       "0..1",   "h:country/text()"],
-  ["use",           "0..1",   "@use", SimpleCode("2.16.840.1.113883.5.1119")]
+  ["use",           "0..1",   "@use", shared.SimpleCode("2.16.840.1.113883.5.1119")]
 ]);
 
 var Name = Component.define("Name")
@@ -74,18 +25,18 @@ var Name = Component.define("Name")
   ["givens", "1..*","h:given/text()"],
   ["family", "1..1","h:family/text()"],
   ["suffix", "0..1","h:suffix/text()"],
-  ["use", "0..1", "@use", SimpleCode("2.16.840.1.113883.5.45")]
+  ["use", "0..1", "@use", shared.SimpleCode("2.16.840.1.113883.5.45")]
 ]);
 
 var Telecom = Component.define("Telecom")
 .fields([
   ["value", "1..1","@value"],
-  ["use", "0..1", "@use", SimpleCode("2.16.840.1.113883.5.1119")]
+  ["use", "0..1", "@use", shared.SimpleCode("2.16.840.1.113883.5.1119")]
 ]);
 
 var Guardian = Component.define("Guardian")
 .fields([
-  ["relation","0..1", "h:code", SimplifiedCode],
+  ["relation","0..1", "h:code", shared.SimplifiedCode],
   ["addresses","0..*", "h:addr", Address],
   ["names","1..*", "h:guardianPerson/h:name", Name],
   ["telecoms","0..*", "h:telecom", Telecom],
@@ -93,8 +44,8 @@ var Guardian = Component.define("Guardian")
 
 var LanguageCommunication = Component.define("LanguageCommunication")
 .fields([
-  ["mode","0..1", "h:modeCode", SimplifiedCode],
-  ["proficiency","0..1", "h:proficiencyLevelCode", SimplifiedCode],
+  ["mode","0..1", "h:modeCode", shared.SimplifiedCode],
+  ["proficiency","0..1", "h:proficiencyLevelCode", shared.SimplifiedCode],
   ["code", "1..1","h:languageCode/@code"],
   ["preferred", "1..1","h:preferenceInd/@value", Processor.asBoolean],
 ]);
@@ -135,10 +86,10 @@ var HealthStatus = Component.define("HealthStatus")
 var ProblemObservation = Component.define("ProblemObservation")
 .templateRoot("2.16.840.1.113883.10.20.22.4.4")
 .fields([
-  ["sourceIds","1..*", "h:id", Identifier],
-  ["problemType","1..1", "h:code", ConceptDescriptor],
-  ["problemName","1..1", "h:value", ConceptDescriptor],
-  ["freeTextProblemName","0..1", "h:text", TextWithReference],
+  ["sourceIds","1..*", "h:id", shared.Identifier],
+  ["problemType","1..1", "h:code", shared.ConceptDescriptor],
+  ["problemName","1..1", "h:value", shared.ConceptDescriptor],
+  ["freeTextProblemName","0..1", "h:text", shared.TextWithReference],
   ["dateRange", "1..1", "h:effectiveTime", EffectiveTime],
   ["resolved","1..1", "h:effectiveTime", Processor.pathExists("./@high")],
   ["ageAtOnset", "0..1", 
@@ -146,10 +97,10 @@ var ProblemObservation = Component.define("ProblemObservation")
     PhysicalQuantity],
   ["problemStatus","0..1", 
     ProblemStatus.xpath() + "/h:value", 
-    ConceptDescriptor],
+    shared.ConceptDescriptor],
   ["healthStatus","0..1", 
     HealthStatus.xpath() + "/h:value", 
-    ConceptDescriptor]
+    shared.ConceptDescriptor]
 ]);
 
 var NonProblemObservation = ProblemObservation
@@ -163,9 +114,9 @@ var NonProblemObservation = ProblemObservation
 var ProblemOrganizer = Component.define("ProblemOrganizer")
 .templateRoot("2.16.840.1.113883.10.20.22.4.3")
 .fields([
-  ["sourceIds","1..*", "h:id", Identifier],
+  ["sourceIds","1..*", "h:id", shared.Identifier],
   ["dateRange", "1..1", "h:effectiveTime", EffectiveTime],
-  ["concernStatus", "1..1", "h:statusCode/@code", SimpleCode("2.16.840.1.113883.11.20.9.19")],
+  ["concernStatus", "1..1", "h:statusCode/@code", shared.SimpleCode("2.16.840.1.113883.11.20.9.19")],
   ["problems", "1..*", ProblemObservation.xpath(), ProblemObservation],
   ["nonProblems", "0..*", NonProblemObservation.xpath(), NonProblemObservation]
 ])
@@ -189,12 +140,12 @@ var ProblemsSection = Component.define("ProblemsSection")
 var VitalSignObservation = Component.define("VitalSignObservation")
 .templateRoot("2.16.840.1.113883.10.20.22.4.27")
 .fields([
-  ["sourceIds","1..*", "h:id", Identifier],
-  ["vitalName","1..1", "h:code", ConceptDescriptor],
+  ["sourceIds","1..*", "h:id", shared.Identifier],
+  ["vitalName","1..1", "h:code", shared.ConceptDescriptor],
   ["measuredAt", "1..1", "h:effectiveTime", EffectiveTime],
   ["physicalQuantity","1..1", "h:value[@xsi:type='PQ']", PhysicalQuantity],
-  ["freeTextValue","0..1", "h:text", TextWithReference],
-  ["interpretations", "0..*", "h:interpretationCode[@codeSystem='2.16.840.1.113883.5.83']", SimplifiedCode]
+  ["freeTextValue","0..1", "h:text", shared.TextWithReference],
+  ["interpretations", "0..*", "h:interpretationCode[@codeSystem='2.16.840.1.113883.5.83']", shared.SimplifiedCode]
 ])
 .uriBuilder({
   category: "entries",
@@ -205,8 +156,8 @@ var VitalSignObservation = Component.define("VitalSignObservation")
 var VitalSignsOrganizer = Component.define("VitalSignsOrganizer")
 .templateRoot("2.16.840.1.113883.10.20.22.4.26")
 .fields([
-  ["panelName","0..1", "h:code", ConceptDescriptor],
-  ["sourceIds","1..*", "h:id", Identifier],
+  ["panelName","0..1", "h:code", shared.ConceptDescriptor],
+  ["sourceIds","1..*", "h:id", shared.Identifier],
   ["vitals", "1..*", VitalSignObservation.xpath(), VitalSignObservation]
 ])
 .uriBuilder({
@@ -218,7 +169,7 @@ var VitalSignsOrganizer = Component.define("VitalSignsOrganizer")
 var VitalSignsSection = Component.define("VitalSignsSection")
 .templateRoot("2.16.840.1.113883.10.20.22.2.4.1")
 .fields([
-  //["name","0..1", "h:code", ConceptDescriptor],
+  //["name","0..1", "h:code", shared.ConceptDescriptor],
   ["panels","0..*", VitalSignsOrganizer.xpath(), VitalSignsOrganizer],
 ])
 .uriBuilder({
@@ -232,8 +183,8 @@ var ImmunizationRefusalReason = Component.define("ImmunizationRefusalReason")
 var ImmunizationInformation = Component.define("ImmunizationInformation")
 .templateRoot("2.16.840.1.113883.10.20.22.4.54")
 .fields([
-  ["productName","0..1", ".//h:manufacturedMaterial/h:code", ConceptDescriptor],
-  ["freeTextProductName","0..1", ".//h:manufacturedMaterial/h:code/h:originalText", TextWithReference],
+  ["productName","0..1", ".//h:manufacturedMaterial/h:code", shared.ConceptDescriptor],
+  ["freeTextProductName","0..1", ".//h:manufacturedMaterial/h:code/h:originalText", shared.TextWithReference],
   ["lotNumber","0..1", "h:lotNumberText/text()"],
 ]);
 
@@ -241,16 +192,16 @@ var ImmunizationActivity = Component.define("ImmunizationActivity")
 .templateRoot("2.16.840.1.113883.10.20.22.4.52")
 .withMood("EVN")
 .fields([
-  ["sourceIds","1..*", "h:id", Identifier],
-  ["deliveryMethod","0..1", "h:code", ConceptDescriptor],
-  ["route","0..1", "h:routeCode", SimplifiedCode],
-  ["site","0..1", "h:approachSiteCode", ConceptDescriptor],
-  ["administrationUnit","0..1", "h:administrationUnitCode", ConceptDescriptor],
+  ["sourceIds","1..*", "h:id", shared.Identifier],
+  ["deliveryMethod","0..1", "h:code", shared.ConceptDescriptor],
+  ["route","0..1", "h:routeCode", shared.SimplifiedCode],
+  ["site","0..1", "h:approachSiteCode", shared.ConceptDescriptor],
+  ["administrationUnit","0..1", "h:administrationUnitCode", shared.ConceptDescriptor],
   ["date", "1..1", "h:effectiveTime", EffectiveTime],
   ["seriesNumber", "0..1", "h:repeatNumber/@value", EffectiveTime],
   ["immunizationName", "1..1", "h:consumable/h:manufacturedProduct", ImmunizationInformation],
-  ["freeText","0..1", "h:text", TextWithReference],
-  ["skippedFor", "0..1", ImmunizationRefusalReason.xpath()+"/h:code", SimplifiedCode]
+  ["freeText","0..1", "h:text", shared.TextWithReference],
+  ["skippedFor", "0..1", ImmunizationRefusalReason.xpath()+"/h:code", shared.SimplifiedCode]
 ])
 .uriBuilder({
   category: "entries",
@@ -294,22 +245,22 @@ var MedicationInformation = Component.define("MedicationInformation")
 .templateRoot("2.16.840.1.113883.10.20.22.4.23")
 .fields([
   ["productName","0..1", "h:manufacturedMaterial/h:code", 
-    ConceptDescriptor.shall({valueSetOid: "2.16.840.1.113883.3.88.12.80.17"})],
-  ["freeTextProductName","0..1", "h:manufacturedMaterial/h:code/h:originalText", TextWithReference],
+    shared.ConceptDescriptor.shall({valueSetOid: "2.16.840.1.113883.3.88.12.80.17"})],
+  ["freeTextProductName","0..1", "h:manufacturedMaterial/h:code/h:originalText", shared.TextWithReference],
   //TODO: datatype?  ["manufacturer","0..1", "h:manufacturerOrganization", ??],
 ]);
 
 var MedicationActivity = Component.define("MedicationActivity")
 .templateRoot("2.16.840.1.113883.10.20.22.4.16")
 .fields([
-  ["sourceIds","1..*", "h:id", Identifier],
-  ["deliveryMethod","0..1", "h:code", ConceptDescriptor],
-  ["route","0..1", "h:routeCode", SimplifiedCode],
-  ["site","0..1", "h:approachSiteCode", ConceptDescriptor],
-  ["administrationUnit","0..1", "h:administrationUnitCode", ConceptDescriptor],
+  ["sourceIds","1..*", "h:id", shared.Identifier],
+  ["deliveryMethod","0..1", "h:code", shared.ConceptDescriptor],
+  ["route","0..1", "h:routeCode", shared.SimplifiedCode],
+  ["site","0..1", "h:approachSiteCode", shared.ConceptDescriptor],
+  ["administrationUnit","0..1", "h:administrationUnitCode", shared.ConceptDescriptor],
   ["times", "1..*", "h:effectiveTime", EffectiveTime],
   ["medicationName", "1..1", "h:consumable/h:manufacturedProduct", MedicationInformation],
-  ["freeTextSig","0..1", "h:text", TextWithReference],
+  ["freeTextSig","0..1", "h:text", shared.TextWithReference],
   ["dose","0..1", "h:doseQuantity", PhysicalQuantity],
   ["rate","0..1", "h:rateQuantity", PhysicalQuantity],
 ])
@@ -358,9 +309,9 @@ var SmokingStatusObservation = Component.define("SmokingStatusObservation")
   "2.16.840.1.113883.10.22.4.78" // incorrect id published in 1.1 DSTU
 ])
 .fields([
-  ["sourceIds","1..*", "h:id", Identifier],
+  ["sourceIds","1..*", "h:id", shared.Identifier],
   ["smokingStatus","0..1", "h:value", 
-    ConceptDescriptor.shall({
+    shared.ConceptDescriptor.shall({
       valueSetOid: "2.16.840.1.113883.11.20.9.38"
     })],
   // TODO: want a better name for this field -- but what does it mean?
@@ -400,12 +351,12 @@ var MedicationsSection = Component.define("MedicationsSection")
 var ResultObservation = Component.define("ResultObservation")
 .templateRoot("2.16.840.1.113883.10.20.22.4.2")
 .fields([
-  ["sourceIds","1..*", "h:id", Identifier],
-  ["resultName","1..1", "h:code", ConceptDescriptor],
+  ["sourceIds","1..*", "h:id", shared.Identifier],
+  ["resultName","1..1", "h:code", shared.ConceptDescriptor],
   ["measuredAt", "1..1", "h:effectiveTime", EffectiveTime],
   ["physicalQuantity","1..1", "h:value[@xsi:type='PQ']", PhysicalQuantity],
-  ["freeTextValue","0..1", "h:text", TextWithReference],
-  ["interpretations", "0..*", "h:interpretationCode[@codeSystem='2.16.840.1.113883.5.83']", SimplifiedCode]
+  ["freeTextValue","0..1", "h:text", shared.TextWithReference],
+  ["interpretations", "0..*", "h:interpretationCode[@codeSystem='2.16.840.1.113883.5.83']", shared.SimplifiedCode]
 ])
 .uriBuilder({
   category: "entries",
@@ -416,8 +367,8 @@ var ResultObservation = Component.define("ResultObservation")
 var ResultsOrganizer = Component.define("ResultsOrganizer")
 .templateRoot("2.16.840.1.113883.10.20.22.4.1")
 .fields([
-  ["sourceIds","1..*", "h:id", Identifier],
-  ["panelName","0..1", "h:code", ConceptDescriptor],
+  ["sourceIds","1..*", "h:id", shared.Identifier],
+  ["panelName","0..1", "h:code", shared.ConceptDescriptor],
   ["results", "1..*", ResultObservation.xpath(), ResultObservation]
 ])
 .uriBuilder({
@@ -431,7 +382,7 @@ var ResultsSection = Component.define("ResultsSection")
   '2.16.840.1.113883.10.20.22.2.3', '2.16.840.1.113883.10.20.22.2.3.1' // .1 for "entries required"
 ])
 .fields([
-  //        ["name","0..1", "h:code", ConceptDescriptor],
+  //        ["name","0..1", "h:code", shared.ConceptDescriptor],
   ["panels","0..*", ResultsOrganizer.xpath(), ResultsOrganizer],
 ])
 .uriBuilder({
@@ -443,16 +394,16 @@ var Patient = Component.define("Patient")
 .fields([
   ["name",                "1..1", "h:patient/h:name", Name],
   ["maritalStatus",       "0..1", "h:patient/h:maritalStatusCode", 
-    SimplifiedCode.shall({valueSetOid: "2.16.840.1.113883.1.11.12212"})],
-  ["religion",            "0..1", "h:patient/h:religiousAffiliationCode", ConceptDescriptor],
-  ["race",                "0..1", "h:patient/h:raceCode", ConceptDescriptor],
-  ["ethnicity",           "0..1", "h:patient/h:ethnicGroupCode", ConceptDescriptor],
+    shared.SimplifiedCode.shall({valueSetOid: "2.16.840.1.113883.1.11.12212"})],
+  ["religion",            "0..1", "h:patient/h:religiousAffiliationCode", shared.ConceptDescriptor],
+  ["race",                "0..1", "h:patient/h:raceCode", shared.ConceptDescriptor],
+  ["ethnicity",           "0..1", "h:patient/h:ethnicGroupCode", shared.ConceptDescriptor],
   ["addresses",             "0..*", "h:addr", Address],
   ["guardians",            "0..*", "h:patient/h:guardian", Guardian],
   ["telecoms",             "0..*", "h:telecom", Telecom],
   ["languages",            "0..*", "h:patient/h:languageCommunication", LanguageCommunication],
-  ["medicalRecordNumbers","1..*", "h:id", Identifier],
-  ["gender",              "1..1", "h:patient/h:administrativeGenderCode", SimplifiedCode],
+  ["medicalRecordNumbers","1..*", "h:id", shared.Identifier],
+  ["gender",              "1..1", "h:patient/h:administrativeGenderCode", shared.SimplifiedCode],
   ["birthTime",           "1..1", "h:patient/h:birthTime/@value", Processor.asTimestamp],
   ["birthTimeResolution", "1..1", "h:patient/h:birthTime/@value", Processor.asTimestampResolution],
 ])
@@ -463,7 +414,7 @@ var Patient = Component.define("Patient")
 
 var CCDA = Component.define("CCDA")
 .fields([
-  ["sourceIds", "1..*", "h:id", Identifier],
+  ["sourceIds", "1..*", "h:id", shared.Identifier],
   ["demographics", "1..1", "//h:recordTarget/h:patientRole", Patient],
   ["vitals", "0..1", VitalSignsSection.xpath(), VitalSignsSection],
   ["results", "0..1", ResultsSection.xpath(), ResultsSection],
@@ -513,4 +464,4 @@ module.exports = function(src, options, callback){
   callback(null, ret);
 };
 
-module.exports.ConceptDescriptor = ConceptDescriptor;
+module.exports.ConceptDescriptor = shared.ConceptDescriptor;
