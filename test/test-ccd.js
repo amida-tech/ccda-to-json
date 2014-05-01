@@ -4,16 +4,16 @@ var assert = require('chai').assert;
 var fs = require('fs');
 var path = require('path');
 
-var ccdParser = require('../index');
+var parser = require('../index');
 var jsutil = require('../lib/jsutil');
 
-describe('load full ccd', function() {
+describe('full ccd parser', function() {
     var ccd = null;
     
     before(function(done) {
         filepath  = path.join(__dirname, 'fixtures/files/CCD_1.xml');
         var xml = fs.readFileSync(filepath, 'utf-8');;
-        ccdParser(xml, {}, function(err, result) {
+        parser(xml, {}, function(err, result) {
             ccd = result.toJSON();
             jsutil.deepDelete(ccd, '_id');
             //var json2Write = JSON.stringify(ccd, undefined, '\t');
