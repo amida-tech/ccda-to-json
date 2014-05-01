@@ -350,7 +350,7 @@ var ResultsSection = Component.define("ResultsSection")
   type: "results"
 });
 
-var CCDA = Component.define("CCDA")
+var CCD = exports.CCD = Component.define("CCD")
 .fields([
   ["sourceIds", "1..*", "h:id", shared.Identifier],
   ["demographics", "1..1", "//h:recordTarget/h:patientRole", Patient],
@@ -366,35 +366,3 @@ var CCDA = Component.define("CCDA")
   type: "ccda"
 }).cleanupStep(Cleanup.fixSectionUris, 1);
 
-
-module.exports = function(src, options, callback){
-
-  if (arguments.length === 2){
-    callback = options;
-    options = {};
-  }
-
-  if(options.hideFields){
-    Component.cleanupStep(Cleanup.hideFields(options.hideFields), "paredown");
-  };
-
-  var patientId = options.patientId || 0;
-  var xml = common.parseXml(src);
-  
-  var ret = new CCDA();
-  ret.patientId = patientId;
-
-  //TODO can we leverage external terminology services
-  //explicitly here, to support browser- and server-side JS?
-  ret.codes = []; // skip code resoution for now
-  
-  ret.src = src;
-  ret.errors = [];
-  ret.run(xml);
-
-  ret.cleanupTree(); // first build the data objects up 
-  ret.cleanupTree("paredown"); // then pare down to essentials
-  callback(null, ret);
-};
-
-module.exports.ConceptDescriptor = shared.ConceptDescriptor;
