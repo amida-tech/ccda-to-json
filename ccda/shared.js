@@ -1,4 +1,5 @@
 var Component = require("./component");
+var Processor = require('./processor');
 var Cleanup = require("./cleanup");
 
 var Identifier = exports.Identifier = Component.define("Identifier")
@@ -46,4 +47,27 @@ var SimplifiedCode = exports.SimplifiedCode = ConceptDescriptor.define("Simpifie
     this.js = this.js.label;
   }
 });
+
+var PhysicalQuantity = exports.PhysicalQuantity = Component.define("PhysicalQuantity")
+.fields([
+  ["value","1..1", "@value", Processor.asFloat], 
+  ["unit", "0..1", "@unit"],
+]);
+
+var EffectiveTime = exports.EffectiveTime = Component.define("EffectiveTime")
+.fields([
+  ["point","0..1", "@value", Processor.asTimestamp],
+  ["pointResolution","0..1", "@value", Processor.asTimestampResolution],
+  ["low","0..1", "h:low/@value", Processor.asTimestamp],
+  ["lowResolution","0..1", "h:low/@value", Processor.asTimestampResolution],
+  ["high","0..1", "h:high/@value", Processor.asTimestamp],
+  ["highResolution","0..1", "h:high/@value", Processor.asTimestampResolution],
+  ["operator","0..1", "./@operator"],
+  ["xsitype","0..1", "./@xsi:type"],
+  ["period","0..1", "./h:period", PhysicalQuantity],
+//  ["precise","0..1", "./@institutionSpecified", Processor.asBoolean],
+])
+.cleanupStep(function(){
+  this.js && delete this.js.xsitype;
+}, "paredown");
 

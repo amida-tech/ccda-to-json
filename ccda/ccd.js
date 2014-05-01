@@ -10,29 +10,7 @@ var Cleanup = require("./cleanup");
 var shared = require('./shared');
 
 var Patient = require('./demographics').Patient;
-
-var PhysicalQuantity = Component.define("PhysicalQuantity")
-.fields([
-  ["value","1..1", "@value", Processor.asFloat], 
-  ["unit", "0..1", "@unit"],
-]);
-
-var EffectiveTime = Component.define("EffectiveTime")
-.fields([
-  ["point","0..1", "@value", Processor.asTimestamp],
-  ["pointResolution","0..1", "@value", Processor.asTimestampResolution],
-  ["low","0..1", "h:low/@value", Processor.asTimestamp],
-  ["lowResolution","0..1", "h:low/@value", Processor.asTimestampResolution],
-  ["high","0..1", "h:high/@value", Processor.asTimestamp],
-  ["highResolution","0..1", "h:high/@value", Processor.asTimestampResolution],
-  ["operator","0..1", "./@operator"],
-  ["xsitype","0..1", "./@xsi:type"],
-  ["period","0..1", "./h:period", PhysicalQuantity],
-//  ["precise","0..1", "./@institutionSpecified", Processor.asBoolean],
-])
-.cleanupStep(function(){
-  this.js && delete this.js.xsitype;
-}, "paredown");
+var ResultsSection = require('./results').ResultsSection;
 
 var AgeObservation = Component.define("AgeObservation")
 .templateRoot("2.16.840.1.113883.10.20.22.4.31");
@@ -50,11 +28,11 @@ var ProblemObservation = Component.define("ProblemObservation")
   ["problemType","1..1", "h:code", shared.ConceptDescriptor],
   ["problemName","1..1", "h:value", shared.ConceptDescriptor],
   ["freeTextProblemName","0..1", "h:text", shared.TextWithReference],
-  ["dateRange", "1..1", "h:effectiveTime", EffectiveTime],
+  ["dateRange", "1..1", "h:effectiveTime", shared.EffectiveTime],
   ["resolved","1..1", "h:effectiveTime", Processor.pathExists("./@high")],
   ["ageAtOnset", "0..1", 
     AgeObservation.xpath() + "/h:value", 
-    PhysicalQuantity],
+    shared.PhysicalQuantity],
   ["problemStatus","0..1", 
     ProblemStatus.xpath() + "/h:value", 
     shared.ConceptDescriptor],
@@ -75,7 +53,7 @@ var ProblemOrganizer = Component.define("ProblemOrganizer")
 .templateRoot("2.16.840.1.113883.10.20.22.4.3")
 .fields([
   ["sourceIds","1..*", "h:id", shared.Identifier],
-  ["dateRange", "1..1", "h:effectiveTime", EffectiveTime],
+  ["dateRange", "1..1", "h:effectiveTime", shared.EffectiveTime],
   ["concernStatus", "1..1", "h:statusCode/@code", shared.SimpleCode("2.16.840.1.113883.11.20.9.19")],
   ["problems", "1..*", ProblemObservation.xpath(), ProblemObservation],
   ["nonProblems", "0..*", NonProblemObservation.xpath(), NonProblemObservation]
@@ -102,8 +80,8 @@ var VitalSignObservation = Component.define("VitalSignObservation")
 .fields([
   ["sourceIds","1..*", "h:id", shared.Identifier],
   ["vitalName","1..1", "h:code", shared.ConceptDescriptor],
-  ["measuredAt", "1..1", "h:effectiveTime", EffectiveTime],
-  ["physicalQuantity","1..1", "h:value[@xsi:type='PQ']", PhysicalQuantity],
+  ["measuredAt", "1..1", "h:effectiveTime", shared.EffectiveTime],
+  ["physicalQuantity","1..1", "h:value[@xsi:type='PQ']", shared.PhysicalQuantity],
   ["freeTextValue","0..1", "h:text", shared.TextWithReference],
   ["interpretations", "0..*", "h:interpretationCode[@codeSystem='2.16.840.1.113883.5.83']", shared.SimplifiedCode]
 ])
@@ -157,8 +135,8 @@ var ImmunizationActivity = Component.define("ImmunizationActivity")
   ["route","0..1", "h:routeCode", shared.SimplifiedCode],
   ["site","0..1", "h:approachSiteCode", shared.ConceptDescriptor],
   ["administrationUnit","0..1", "h:administrationUnitCode", shared.ConceptDescriptor],
-  ["date", "1..1", "h:effectiveTime", EffectiveTime],
-  ["seriesNumber", "0..1", "h:repeatNumber/@value", EffectiveTime],
+  ["date", "1..1", "h:effectiveTime", shared.EffectiveTime],
+  ["seriesNumber", "0..1", "h:repeatNumber/@value", shared.EffectiveTime],
   ["immunizationName", "1..1", "h:consumable/h:manufacturedProduct", ImmunizationInformation],
   ["freeText","0..1", "h:text", shared.TextWithReference],
   ["skippedFor", "0..1", ImmunizationRefusalReason.xpath()+"/h:code", shared.SimplifiedCode]
@@ -218,11 +196,11 @@ var MedicationActivity = Component.define("MedicationActivity")
   ["route","0..1", "h:routeCode", shared.SimplifiedCode],
   ["site","0..1", "h:approachSiteCode", shared.ConceptDescriptor],
   ["administrationUnit","0..1", "h:administrationUnitCode", shared.ConceptDescriptor],
-  ["times", "1..*", "h:effectiveTime", EffectiveTime],
+  ["times", "1..*", "h:effectiveTime", shared.EffectiveTime],
   ["medicationName", "1..1", "h:consumable/h:manufacturedProduct", MedicationInformation],
   ["freeTextSig","0..1", "h:text", shared.TextWithReference],
-  ["dose","0..1", "h:doseQuantity", PhysicalQuantity],
-  ["rate","0..1", "h:rateQuantity", PhysicalQuantity],
+  ["dose","0..1", "h:doseQuantity", shared.PhysicalQuantity],
+  ["rate","0..1", "h:rateQuantity", shared.PhysicalQuantity],
 ])
 .cleanupStep(Cleanup.extractAllFields(["medicationName"]))
 .cleanupStep(function(){
@@ -276,7 +254,7 @@ var SmokingStatusObservation = Component.define("SmokingStatusObservation")
     })],
   // TODO: want a better name for this field -- but what does it mean?
   // http://www.hl7.org/dstucomments/showdetail_comment.cfm?commentid=98
-  ["dateRange", "1..1", "h:effectiveTime", EffectiveTime],
+  ["dateRange", "1..1", "h:effectiveTime", shared.EffectiveTime],
 ])
 .uriBuilder({
   category: "entries",
@@ -307,48 +285,6 @@ var MedicationsSection = Component.define("MedicationsSection")
   "medicationsPrescribed",
   "medicationsReported", 
 ]));
-
-var ResultObservation = Component.define("ResultObservation")
-.templateRoot("2.16.840.1.113883.10.20.22.4.2")
-.fields([
-  ["sourceIds","1..*", "h:id", shared.Identifier],
-  ["resultName","1..1", "h:code", shared.ConceptDescriptor],
-  ["measuredAt", "1..1", "h:effectiveTime", EffectiveTime],
-  ["physicalQuantity","1..1", "h:value[@xsi:type='PQ']", PhysicalQuantity],
-  ["freeTextValue","0..1", "h:text", shared.TextWithReference],
-  ["interpretations", "0..*", "h:interpretationCode[@codeSystem='2.16.840.1.113883.5.83']", shared.SimplifiedCode]
-])
-.uriBuilder({
-  category: "entries",
-  type: "results"
-});
-
-
-var ResultsOrganizer = Component.define("ResultsOrganizer")
-.templateRoot("2.16.840.1.113883.10.20.22.4.1")
-.fields([
-  ["sourceIds","1..*", "h:id", shared.Identifier],
-  ["panelName","0..1", "h:code", shared.ConceptDescriptor],
-  ["results", "1..*", ResultObservation.xpath(), ResultObservation]
-])
-.uriBuilder({
-  category: "organizers",
-  type: "results"
-});
-
-
-var ResultsSection = Component.define("ResultsSection")
-.templateRoot([
-  '2.16.840.1.113883.10.20.22.2.3', '2.16.840.1.113883.10.20.22.2.3.1' // .1 for "entries required"
-])
-.fields([
-  //        ["name","0..1", "h:code", shared.ConceptDescriptor],
-  ["panels","0..*", ResultsOrganizer.xpath(), ResultsOrganizer],
-])
-.uriBuilder({
-  category: "sections",
-  type: "results"
-});
 
 var CCD = exports.CCD = Component.define("CCD")
 .fields([
