@@ -2,6 +2,19 @@ var Component = require('./ccda/Component');
 var common = require('./ccda/common');
 var ccd = require('./ccda/ccd');
 
+var xmlToJSONers = {
+   ccd: require('./ccda/ccd').CCD,
+   demographics: require('./ccda/demographics').Patient
+};
+
+var getXMLToJSONer = function(xmlType) {
+    if (xmlType) {
+        return xmlToJSONers[xmlType];
+    } else {
+        return xmlToJSONers['ccd'];
+    }
+};
+
 module.exports = function(src, options, callback) {
     if (arguments.length === 2){
         callback = options;
@@ -11,11 +24,12 @@ module.exports = function(src, options, callback) {
     if (options.hideFields){
         Component.cleanupStep(Cleanup.hideFields(options.hideFields), "paredown");
     };
-
+    
     var patientId = options.patientId || 0;
     var xml = common.parseXml(src);
     
-    var ret = new ccd.CCD();
+    var xmlToJSONer = getXMLToJSONer(options.xmlType);
+    var ret = new xmlToJSONer();
     ret.patientId = patientId;
 
     //TODO can we leverage external terminology services
