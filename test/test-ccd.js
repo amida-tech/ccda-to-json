@@ -127,4 +127,22 @@ describe('full ccd parser', function() {
         done();
     });
 
+    it ('results spot check', function(done) {
+        expect(ccd.results).to.exist;
+        expect(ccd.results.panels).to.have.length(1);
+        
+        expect(ccd.results.panels[0].panelName).to.exist;
+        expect(ccd.results.panels[0].panelName.code).to.equal('43789009');
+        expect(ccd.results.panels[0].panelName.label).to.equal("CBC WO DIFFERENTIAL");
+        
+        expect(ccd.results.panels[0].results).to.exist;
+        expect(ccd.results.panels[0].results).to.have.length(3);
+        
+        expect(ccd.results.panels[0].results[2].resultName).to.exist;
+        expect(ccd.results.panels[0].results[2].resultName.code).to.equal('26515-7');
+        expect(ccd.results.panels[0].results[2].resultName.label).to.equal('PLT');
+        
+        done();
+    });
+    
 });
