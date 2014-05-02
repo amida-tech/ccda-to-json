@@ -70,4 +70,23 @@ describe('full ccd parser', function() {
         
         done();
     });
+    
+    it ('medications spot check', function(done) {
+        expect(ccd.medications).to.exist;
+        expect(ccd.medications.medicationsReported).to.exist;
+        expect(ccd.medications.medicationsReported).to.have.length(1);
+        
+        expect(ccd.medications.medicationsReported[0].route).to.equal('RESPIRATORY (INHALATION)');
+        expect(ccd.medications.medicationsReported[0].productName).to.exist;
+        expect(ccd.medications.medicationsReported[0].productName.label).to.equal('Proventil HFA');
+        expect(ccd.medications.medicationsReported[0].productName.code).to.equal('219483');
+
+        expect(ccd.medications.medicationsReported[0].productName.code).to.equal('219483');
+
+        expect(ccd.medications.medicationsReported[0].dosePeriod).to.exist;
+        expect(ccd.medications.medicationsReported[0].dosePeriod.value).to.equal(6);
+        expect(ccd.medications.medicationsReported[0].dosePeriod.unit).to.equal('h');
+
+        done();
+    });
 });
