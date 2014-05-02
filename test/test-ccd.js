@@ -1,5 +1,9 @@
-var expect = require('chai').expect;
-var assert = require('chai').assert;
+var chai = require('chai');
+var chaidt = require('chai-datetime');
+chai.use(chaidt);
+
+var expect = chai.expect;
+var assert = chai.assert;
 
 var fs = require('fs');
 var path = require('path');
@@ -87,6 +91,25 @@ describe('full ccd parser', function() {
         expect(ccd.medications.medicationsReported[0].dosePeriod.value).to.equal(6);
         expect(ccd.medications.medicationsReported[0].dosePeriod.unit).to.equal('h');
 
+        done();
+    });
+
+    it ('problems spot check', function(done) {
+        expect(ccd.problems).to.exist;
+        expect(ccd.problems.problemConcerns).to.exist;
+        expect(ccd.problems.problemConcerns).to.have.length(2);
+
+        expect(ccd.problems.problemConcerns[1].concernStatus).to.equal('completed');
+        expect(ccd.problems.problemConcerns[1].problems).to.exist;
+        expect(ccd.problems.problemConcerns[1].problems).to.have.length(1);
+        expect(ccd.problems.problemConcerns[1].problems[0].problemName).to.exist;
+        expect(ccd.problems.problemConcerns[1].problems[0].problemName.label).to.equal('Asthma');
+        expect(ccd.problems.problemConcerns[1].problems[0].dateRange).to.exist;
+        expect(ccd.problems.problemConcerns[1].problems[0].dateRange.low).to.exist;
+        expect(JSON.stringify(ccd.problems.problemConcerns[1].problems[0].dateRange.low)).to.equal('"2007-01-03T00:00:00.000Z"');
+        expect(ccd.problems.problemConcerns[1].problems[0].dateRange.lowResolution).to.equal('day');
+
+        
         done();
     });
 });

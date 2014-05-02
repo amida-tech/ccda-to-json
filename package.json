@@ -19,6 +19,7 @@
   "devDependencies": {
       "path": "0.4.x",
       "chai": "1.8.x",
+      "chai-datetime": "*",
       "mocha": "1.17.x"
   },
   "engine": "node >= 0.6.0",
