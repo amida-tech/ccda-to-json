@@ -27,16 +27,7 @@ describe('demographics parser', function() {
         expect(demographics).to.exist;
         var filepath  = path.join(__dirname, 'fixtures/file-snippets/json/CCD_1_Demographics.json');
         var json2Read = fs.readFileSync(filepath, 'utf-8');;
-        var expectedDemographics = JSON.parse(json2Read, function(key, value) {
-            var reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/;
-            if (typeof value === 'string') {
-                var a = reISO.exec(value);
-                if (a) {
-                    return new Date(value);
-                }
-            }
-            return value;
-        });
+        var expectedDemographics = jsutil.jsonParseWithDate(json2Read);
         expect(demographics).to.deep.equal(expectedDemographics);
         done();
     });

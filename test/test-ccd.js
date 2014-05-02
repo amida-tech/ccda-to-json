@@ -27,16 +27,7 @@ describe('full ccd parser', function() {
         expect(ccd).to.exist;
         var filepath  = path.join(__dirname, 'fixtures/files/json/CCD_1.json');
         var json2Read = fs.readFileSync(filepath, 'utf-8');;
-        var expectedCCD = JSON.parse(json2Read, function(key, value) {
-            var reISO = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/;
-            if (typeof value === 'string') {
-                var a = reISO.exec(value);
-                if (a) {
-                    return new Date(value);
-                }
-            }
-            return value;
-        });
+        var expectedCCD = jsutil.jsonParseWithDate(json2Read);
         expect(ccd).to.deep.equal(expectedCCD);
         done();
     });
