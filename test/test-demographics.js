@@ -32,7 +32,7 @@ describe('demographics parser', function() {
         done();
     });
     
-    it ('demographics spot check', function(done) {
+    it ('spot check', function(done) {
         expect(demographics.name).to.exists;
         expect(demographics.name.family).to.equal('Jones');
         expect(demographics.name.givens).to.have.length(2);

@@ -4,7 +4,8 @@ var ccd = require('./ccda/ccd');
 
 var xmlToJSONers = {
    ccd: require('./ccda/ccd').CCD,
-   demographics: require('./ccda/demographics').Patient
+   demographics: require('./ccda/demographics').Patient,
+   vitals: require('./ccda/vitals').VitalSignsSection
 };
 
 var getXMLToJSONer = function(xmlType) {

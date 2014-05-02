@@ -53,9 +53,21 @@ describe('full ccd parser', function() {
     it ('vitals spot check', function(done) {
         expect(ccd.vitals).to.exist;
         expect(ccd.vitals.panels).to.have.length(2);
+        
         expect(ccd.vitals.panels[0].vitals).to.have.length(3);
         expect(ccd.vitals.panels[0].vitals[0].vitalName).exist;
         expect(ccd.vitals.panels[0].vitals[0].vitalName.label).to.equal('Height');
+        expect(ccd.vitals.panels[0].vitals[0].physicalQuantity).exist;
+        expect(ccd.vitals.panels[0].vitals[0].physicalQuantity.value).to.equal(177);
+        expect(ccd.vitals.panels[0].vitals[0].physicalQuantity.unit).to.equal('cm');
+
+        expect(ccd.vitals.panels[1].vitals).to.have.length(3);
+        expect(ccd.vitals.panels[1].vitals[1].vitalName).exist;
+        expect(ccd.vitals.panels[1].vitals[1].vitalName.label).to.equal('Patient Body Weight - Measured');
+        expect(ccd.vitals.panels[1].vitals[1].physicalQuantity).exist;
+        expect(ccd.vitals.panels[1].vitals[1].physicalQuantity.value).to.equal(88);
+        expect(ccd.vitals.panels[1].vitals[1].physicalQuantity.unit).to.equal('kg');
+        
         done();
     });
 });
