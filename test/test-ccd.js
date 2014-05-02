@@ -108,8 +108,23 @@ describe('full ccd parser', function() {
         expect(ccd.problems.problemConcerns[1].problems[0].dateRange.low).to.exist;
         expect(JSON.stringify(ccd.problems.problemConcerns[1].problems[0].dateRange.low)).to.equal('"2007-01-03T00:00:00.000Z"');
         expect(ccd.problems.problemConcerns[1].problems[0].dateRange.lowResolution).to.equal('day');
-
         
         done();
     });
+    
+    it ('immunizations spot check', function(done) {
+        expect(ccd.immunizations).to.exist;
+        expect(ccd.immunizations.immunizationsGiven).to.exist;
+        expect(ccd.immunizations.immunizationsGiven).to.have.length(2);
+        
+        expect(ccd.immunizations.immunizationsGiven[0].route).to.equal('Intramuscular injection');
+        expect(ccd.immunizations.immunizationsGiven[0].productName).to.exist;
+        expect(ccd.immunizations.immunizationsGiven[0].productName.code).to.equal('88');
+        expect(ccd.immunizations.immunizationsGiven[0].productName.label).to.equal("Influenza virus vaccine");
+        expect(JSON.stringify(ccd.immunizations.immunizationsGiven[0].date.point)).to.equal('"1999-11-01T00:00:00.000Z"');
+        expect(ccd.immunizations.immunizationsGiven[0].date.pointResolution).to.equal('month');
+        
+        done();
+    });
+
 });
