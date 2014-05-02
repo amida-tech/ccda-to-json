@@ -7,7 +7,8 @@ var xmlToJSONers = {
    demographics: require('./ccda/demographics').Patient,
    vitals: require('./ccda/vitals').VitalSignsSection,
    medications: require('./ccda/medications').MedicationsSection,
-   problems: require('./ccda/problems').ProblemsSection
+   problems: require('./ccda/problems').ProblemsSection,
+   immunizations: require('./ccda/immunizations').ImmunizationsSection
 };
 
 var getXMLToJSONer = function(xmlType) {
