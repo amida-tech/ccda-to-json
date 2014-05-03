@@ -14,7 +14,7 @@ var argv = require('optimist')
 .describe('r', 'Overwrite existing URIs when available')
 .alias('m', 'mongo-db')
 .describe('m', 'load result into mongdb')
-.argv
+.argv;
 
 var src = fs.readFileSync(argv.f);
 ccda.import(argv.p, src, argv, function(err, result) {

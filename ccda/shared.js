@@ -27,7 +27,7 @@ ConceptDescriptor.fields([
 .cleanupStep(Cleanup.validateShalls)
 .cleanupStep(Cleanup.augmentConcept)
 .cleanupStep(function(){
-  (this.js && this.js.system && delete this.js.system);
+  if (this.js && this.js.system) delete this.js.system;
 }, "paredown");
 
 var SimpleCode = exports.SimpleCode = function(oid){
@@ -68,6 +68,6 @@ var EffectiveTime = exports.EffectiveTime = Component.define("EffectiveTime")
 //  ["precise","0..1", "./@institutionSpecified", Processor.asBoolean],
 ])
 .cleanupStep(function(){
-  this.js && delete this.js.xsitype;
+  if (this.js) delete this.js.xsitype;
 }, "paredown");
 

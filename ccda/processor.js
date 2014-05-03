@@ -1,5 +1,5 @@
 var XDate = require("xdate");
-var xpath = require("./common").xpath 
+var xpath = require("./common").xpath; 
 var Processor = module.exports = {};
 
 Processor.asString = function(v){

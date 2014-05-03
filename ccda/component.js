@@ -13,7 +13,7 @@ function Component() {
   this.hidden = {};
   this.topComponent = this;
   this.parentComponent = this;
-};
+}
 
 Component.classInit = function(name){
   this.cleanupSteps = {};
@@ -47,7 +47,7 @@ Component.shall = function(conditions){
   var ret = this.define(this.componentName + JSON.stringify(conditions));
   ret.shallConditions = conditions;
   return ret;
-}
+};
 
 Component.templateRoot = function(roots) {
   this.templateRoots = [];
@@ -71,7 +71,7 @@ Component.prototype.pathToTop = function() {
     }
     [].push.apply(ret, chainUp(c.parentComponent));
     return ret;
-  };
+  }
 
   return chainUp(this);
 };
@@ -87,7 +87,7 @@ Component.xpath = function(){
   }
 
   if (this._containingChild) {
-    ret = util.format("(%s)[.//h:templateId[@root='%s']]", ret, this._containingChild)
+    ret = util.format("(%s)[.//h:templateId[@root='%s']]", ret, this._containingChild);
   }
 
   if (this._negationStatus !== undefined) {
@@ -156,12 +156,12 @@ Component.prototype.cleanupTree = function(level){
   deepForEach(this, {
     pre: function(v){
       if (v instanceof Component){
-        return v.js
+        return v.js;
       }
       return v;
     },
     post: function(v){
-      v && v.cleanup && v.cleanup(level);
+      if (v && v.cleanup) v.cleanup(level);
     }
   });
 };
@@ -172,7 +172,7 @@ Component.prototype.cleanup = function(level){
   while (stepper) {
     supers.unshift(stepper);
     stepper = stepper.super_;
-  };
+  }
   supers.forEach(function(stepper){
     if (stepper.cleanupSteps[level]) {
       stepper.cleanupSteps[level].forEach(function(step){
@@ -184,15 +184,15 @@ Component.prototype.cleanup = function(level){
 };
 
 Component.prototype.setJs = function(path, val) {
-  var parts = path.split(/\./)
-  , hook = this.js
-  , i;
+  var parts = path.split(/\./);
+  var hook = this.js;
+  var i;
 
   for (i=0; i < parts.length - 1; i++){
     hook = hook[parts[i]] || (hook[parts[i]] = {});
   }
   hook[parts[i]] = val;
-}
+};
 
 Component.prototype.run = function(node) {
   this.node = node;
@@ -233,7 +233,7 @@ Component.prototype.getLinks = function(){
     if (!t) {
       return;
     }
-    links[t.category] = a.js['_id'];
+    links[t.category] = a.js._id;
   }, this);
 
   return links;

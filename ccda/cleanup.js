@@ -30,7 +30,7 @@ Cleanup.clearNulls = function(){
 
 Cleanup.assignUri = function(){
   var t= this.constructor.uriTemplate;
-  this.js['_id'] = common.patientUri(this.topComponent.patientId)+"/"+t.category + "/" + t.type + "/"+ (uuid.v4());
+  this.js._id = common.patientUri(this.topComponent.patientId)+"/"+t.category + "/" + t.type + "/"+ (uuid.v4());
 };
 
 Cleanup.fixSectionUris = function(){
@@ -47,7 +47,7 @@ Cleanup.fixSectionUris = function(){
 };
 
 Cleanup.assignPatient = function(){
-  this.js['_patient'] = common.patientUri(this.topComponent.patientId);
+  this.js._patient = common.patientUri(this.topComponent.patientId);
 };
 
 
@@ -55,16 +55,17 @@ Cleanup.resolveReference = function(){
   if (this.js === null){
     return; 
   }
-  this.js.text = this.js.text.join("").match(/\s*(.*)\s*/)[1]
+  this.js.text = this.js.text.join("").match(/\s*(.*)\s*/)[1];
   var r = this.js.reference && this.js.reference.match(/#(.*)/);
+  var resolved = null;
   if (r && r.length == 2){
-    var resolved = common.xpath(this.node, "//*[@ID='"+r[1]+"']/text()");
-  } 
-  if (resolved && resolved.length === 1) {
-    var ret = Processor.asString(resolved[0]);
+    resolved = common.xpath(this.node, "//*[@ID='"+r[1]+"']/text()");
   }
-  else {
-    var ret = this.js.text
+  var ret = null;
+  if (resolved && resolved.length === 1) {
+    ret = Processor.asString(resolved[0]);
+  } else {
+    ret = this.js.text;
   }
 
   this.js = ret || null;
@@ -90,11 +91,12 @@ Cleanup.augmentConcept = function(){
     this.js = null;
     return;
   }
-
+  var knownCode = null;
+  
   if (this.topComponent.codes) {
-    var knownCode = this.topComponent.codes[this.js.system+"#"+this.js.code] || null;
+    knownCode = this.topComponent.codes[this.js.system+"#"+this.js.code] || null;
   }
-
+  
   if (!OIDs[this.js.system]){
     OIDs[this.js.system] = {
       uri: "urn:oid:"+this.js.system+"#",
@@ -150,7 +152,7 @@ Cleanup.ensureMutuallyExclusive = function(ps){
       }, this);
       this.js[p] = newps;
     }, this);
-  }
+  };
 };
 
 Cleanup.remapUris = function(uriMap) {

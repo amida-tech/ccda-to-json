@@ -17,14 +17,12 @@ function deepForEach(obj, fns){
   var ret;
   if (obj === null) {
     ret = null;
-  }
-  else if (Array.isArray(obj)){
+  } else if (Array.isArray(obj)){
     ret = obj.map(function(elt){
       return deepForEach(elt, fns);
     });
-  }
-  else if (isPlainObject(obj)) {
-    var ret = {};
+  } else if (isPlainObject(obj)) {
+    ret = {};
     Object.keys(obj).forEach(function(k){
       ret[k] = deepForEach(obj[k], fns);
     });
@@ -36,12 +34,12 @@ function deepForEach(obj, fns){
     ret = fns.post(inobj, ret);
   }
   return ret;
-};
+}
 
 var DEFAULT_NS = {
   "h": "urn:hl7-org:v3",
   "xsi": "http://www.w3.org/2001/XMLSchema-instance"
-}
+};
 
 var xpath = function(doc, p, ns){
   var r;
@@ -50,7 +48,7 @@ var xpath = function(doc, p, ns){
     r = doc.find(p, ns || DEFAULT_NS);
   } else {
     r = [];
-    var riter = (doc.ownerDocument || doc).evaluate(p, doc, function(n){return (ns || DEFAULT_NS)[n] || null}, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+    var riter = (doc.ownerDocument || doc).evaluate(p, doc, function(n){return (ns || DEFAULT_NS)[n] || null;}, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
     while(true){
       var tmp = riter.iterateNext();
       if (tmp) {r.push(tmp);}
@@ -68,20 +66,19 @@ function tokenizeDemographics(d){
     ret.push(d.name.family);
   }
 
-
-  d.addresss && d.addresses.forEach(function(a){
-    a.zip && ret.push(a.zip);
-    a.city && [].push.apply(ret, a.city.split(/\s/));
-    a.state && ret.push(a.state);
+  if (d.addresss) d.addresses.forEach(function(a){
+    if (a.zip) ret.push(a.zip);
+    if (a.city) [].push.apply(ret, a.city.split(/\s/));
+    if (a.state) ret.push(a.state);
   });
 
-  d.medicalRecordNumbers && d.medicalRecordNumbers.forEach(function(mrn){
-    mrn.root && ret.push(mrn.root);
-    mrn.extension && ret.push(mrn.extension);
+  if (d.medicalRecordNumbers) d.medicalRecordNumbers.forEach(function(mrn){
+    if (mrn.root) ret.push(mrn.root);
+    if (mrn.extension) ret.push(mrn.extension);
   });
 
-  d.gender && ret.push(d.gender);
-  d.birthTime && ret.push(d.birthTime.toISOString());
+  if (d.gender) ret.push(d.gender);
+  if (d.birthTime) ret.push(d.birthTime.toISOString());
 
   ret = ret.map(function(t){
     return t.toLowerCase();
@@ -97,24 +94,23 @@ function parseCollectionName(uri){
 
 function patientUri(patientId){
   return publicUri + "/patients/"+patientId;
-};
+}
 
 function parseXml(src){
-  var xml;
+  var xml = null;
 
   if (process.title === "node"){
     xml = require("libxmljs").parseXmlString(src);
-  }
-  else if (typeof src === "string"){
-    var xml = new DOMParser().parseFromString(src, "text/xml");
+  } else if (typeof src === "string"){
+    xml = new DOMParser().parseFromString(src, "text/xml");
   } else if (typeof src === "object" && src.constructor === Document) {
-    var xml = src;
+    xml = src;
   } else {
     throw "Unrecognized document type " + typeof src;
   }
 
   return xml;
-};
+}
 
 module.exports = {
   deepForEach: deepForEach,
@@ -123,5 +119,5 @@ module.exports = {
   tokenizeDemographics: tokenizeDemographics,
   parseCollectionName: parseCollectionName,
   patientUri: patientUri
-}
+};
 

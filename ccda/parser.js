@@ -9,12 +9,12 @@ var xpath = common.xpath;
  });
  */
 
-function Parser(){};
+function Parser(){}
 
 Parser.prototype.init = function (jsPath, cardinality, xpath, component) {
   var range = cardinality.split(/\.\./);
   var lower = range[0];
-  var upper = range[range.length - 1]
+  var upper = range[range.length - 1];
 
   this.xpath = xpath;
   this.cardinality = cardinality;
@@ -27,9 +27,10 @@ Parser.prototype.init = function (jsPath, cardinality, xpath, component) {
   return this;
 };
 Parser.prototype.run = function (parentComponent, node) {
-  var subComponent = this.component
-  , matches = xpath(node, this.xpath)
-  , jsVal;
+  var subComponent = this.component;
+  var matches = xpath(node, this.xpath);
+  var jsVal;
+  
   jsVal = matches.map(function(match, i) {
 
     if (subComponent && subComponent.componentName) {
@@ -57,13 +58,13 @@ Parser.prototype.run = function (parentComponent, node) {
                     " at " + this.xpath);
   }
 
-  if (this.required && jsVal.length == 0) {
-    var msg = parentComponent.pathToTop().map(function(a){return a.constructor.componentName});
+  if (this.required && jsVal.length === 0) {
+    var msg = parentComponent.pathToTop().map(function(a){return a.constructor.componentName;});
     parentComponent.topComponent.errors.push("nullFlavor alert:  missing but required " + this.jsPath + " in " + msg.join(" -> "));
   }
 
   if (!this.multiple){
-    jsVal = (jsVal.length == 0 ? null : jsVal[0]);
+    jsVal = (jsVal.length === 0 ? null : jsVal[0]);
   }
 
   parentComponent.setJs(this.jsPath, jsVal);
