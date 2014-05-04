@@ -37,7 +37,7 @@ Parser.prototype.run = function (parentComponent, node) {
       var subTree = new subComponent();
       subTree.topComponent = parentComponent.topComponent;
       subTree.parentComponent = parentComponent;
-      if (subTree.constructor.parsers.length > 0) {
+      if (subTree.component.parsers.length > 0) {
         subTree.run(match);
       }
       else {
@@ -59,7 +59,7 @@ Parser.prototype.run = function (parentComponent, node) {
   }
 
   if (this.required && jsVal.length === 0) {
-    var msg = parentComponent.pathToTop().map(function(a){return a.constructor.componentName;});
+    var msg = parentComponent.pathToTop().map(function(a){return a.component.componentName;});
     parentComponent.topComponent.errors.push("nullFlavor alert:  missing but required " + this.jsPath + " in " + msg.join(" -> "));
   }
 

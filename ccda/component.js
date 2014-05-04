@@ -8,12 +8,8 @@ var XDate = require("xdate");
 
 var deepForEach = common.deepForEach;
 
-function Component() {
-  this.js = {};
-  this.hidden = {};
-  this.topComponent = this;
-  this.parentComponent = this;
-}
+var Component = function() {
+};
 
 Component.classInit = function(name){
   this.cleanupSteps = {};
@@ -29,7 +25,11 @@ Component.classInit("Component");
 Component.define = function(name){
 
   function subcomponent() {
-    subcomponent.super_.call(this); 
+      this.js = {};
+      this.hidden = {};
+      this.topComponent = this;
+      this.parentComponent = this;
+      this.component = subcomponent;
   }
 
   // class-level super_
@@ -167,7 +167,7 @@ Component.prototype.cleanupTree = function(level){
 };
 
 Component.prototype.cleanup = function(level){
-  var stepper = this.constructor;
+  var stepper = this.component;
   var supers = [];
   while (stepper) {
     supers.unshift(stepper);
@@ -197,12 +197,12 @@ Component.prototype.setJs = function(path, val) {
 Component.prototype.run = function(node) {
   this.node = node;
 
-  if (0 === this.constructor.parsers.length) {
+  if (0 === this.component.parsers.length) {
     assert(node === null || -1 === ['object'].indexOf(typeof node));
     this.js = node;
   }
 
-  this.constructor.parsers.forEach(function(p){
+  this.component.parsers.forEach(function(p){
     p.run(this, node);
   }, this);
   return this;
@@ -229,7 +229,7 @@ Component.prototype.getLinks = function(){
   };
 
   this.pathToTop().slice(1).forEach(function(a){
-    var t = a.constructor.uriTemplate;
+    var t = a.component.uriTemplate;
     if (!t) {
       return;
     }

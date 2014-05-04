@@ -29,18 +29,18 @@ Cleanup.clearNulls = function(){
 };
 
 Cleanup.assignUri = function(){
-  var t= this.constructor.uriTemplate;
+  var t = this.component.uriTemplate;
   this.js._id = common.patientUri(this.topComponent.patientId)+"/"+t.category + "/" + t.type + "/"+ (uuid.v4());
 };
 
 Cleanup.fixSectionUris = function(){
   Object.keys(this.js).forEach(function(k){
     var v = this.js[k];
-    if (v && v.constructor && 
-      v.constructor.uriTemplate && 
-    v.constructor.uriTemplate.category === "sections") {
+    if (v && v.component && 
+      v.component.uriTemplate && 
+    v.component.uriTemplate.category === "sections") {
       var parts = this.js._id.split("documents/ccda");
-      v.js._id = parts[0] + "sections/" + v.constructor.uriTemplate.type + parts[1];
+      v.js._id = parts[0] + "sections/" + v.component.uriTemplate.type + parts[1];
     }
   }, this);
 
@@ -73,7 +73,7 @@ Cleanup.resolveReference = function(){
 
 
 Cleanup.validateShalls = function(){
-  var t = this.constructor;
+  var t = this.component;
   if (t.shallConditions && t.shallConditions.valueSetOid) {
     var haveCode = this.js.system + "#" + this.js.code;
     var known = this.topComponent.codes[haveCode];
