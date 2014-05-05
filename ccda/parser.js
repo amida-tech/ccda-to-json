@@ -34,7 +34,7 @@ Parser.prototype.run = function (parentComponent, node) {
   jsVal = matches.map(function(match, i) {
 
     if (subComponent && subComponent.componentName) {
-      var subTree = new subComponent();
+      var subTree = subComponent.instance();
       subTree.topComponent = parentComponent.topComponent;
       subTree.parentComponent = parentComponent;
       if (subTree.component.parsers.length > 0) {

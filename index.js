@@ -34,7 +34,7 @@ module.exports = function(src, options, callback) {
     var xml = common.parseXml(src);
     
     var xmlToJSONer = getXMLToJSONer(options.xmlType);
-    var ret = new xmlToJSONer();
+    var ret = xmlToJSONer.instance();
     ret.patientId = patientId;
 
     //TODO can we leverage external terminology services

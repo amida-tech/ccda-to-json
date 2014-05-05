@@ -162,7 +162,7 @@ Cleanup.remapUris = function(uriMap) {
   Cleanup.fixSectionUris.call(this);
   common.deepForEach(this, {
     pre: function(v){
-      if (v instanceof Component){
+      if (ComponentInstance.isPrototypeOf(v)){
         if (v.js && v.js._id) {
           var m = uriMap[v.js._id] && uriMap[v.js._id].matches;
           v.js._id = m && m[0] && m[0]._id || v.js._id;
