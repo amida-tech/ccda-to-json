@@ -43,7 +43,7 @@ var LanguageCommunication = Component.define("LanguageCommunication")
   ["preferred", "1..1","h:preferenceInd/@value", Processor.asBoolean],
 ]);
 
-var Patient = exports.Patient = Component.define("Patient")
+exports.Patient = Component.define("Patient")
 .fields([
   ["name",                "1..1", "h:patient/h:name", Name],
   ["maritalStatus",       "0..1", "h:patient/h:maritalStatusCode", 

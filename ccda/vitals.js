@@ -30,8 +30,7 @@ var VitalSignsOrganizer = Component.define("VitalSignsOrganizer")
   type: "vitals"
 });
 
-
-var VitalSignsSection = exports.VitalSignsSection = Component.define("VitalSignsSection")
+exports.VitalSignsSection = Component.define("VitalSignsSection")
 .templateRoot("2.16.840.1.113883.10.20.22.2.4.1")
 .fields([
   //["name","0..1", "h:code", shared.ConceptDescriptor],

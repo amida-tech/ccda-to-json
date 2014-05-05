@@ -22,7 +22,7 @@ var SmokingStatusObservation = Component.define("SmokingStatusObservation")
   type: "smokingStatus"
 }) ;
 
-var SocialHistorySection = exports.SocialHistorySection = Component.define("SocialHistorSection")
+exports.SocialHistorySection = Component.define("SocialHistorSection")
 .templateRoot(["2.16.840.1.113883.10.20.22.2.17"])
 .fields([
   ["smokingStatuses","0..*", SmokingStatusObservation.xpath(), SmokingStatusObservation]

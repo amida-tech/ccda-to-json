@@ -65,7 +65,7 @@ var MedActivityHx = MedicationActivity.define("MedActivityHx")
   type:"medicationsReported"
 });
 
-var MedicationsSection = exports.MedicationsSection = Component.define("MedicationsSection")
+exports.MedicationsSection = Component.define("MedicationsSection")
 .templateRoot(["2.16.840.1.113883.10.20.22.2.1", "2.16.840.1.113883.10.20.22.2.1.1"])
 .fields([
   ["medicationsPrescribed","0..*", MedActivityRx.xpath(), MedActivityRx],

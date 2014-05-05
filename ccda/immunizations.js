@@ -49,7 +49,7 @@ var RefusedImmunization = ImmunizationActivity.define("RefusedImmunization")
   type:"immunizationsSkipped"
 });
 
-var ImmunizationsSection = exports.ImmunizationsSection = Component.define("ImmunizationsSection")
+exports.ImmunizationsSection = Component.define("ImmunizationsSection")
 .templateRoot(["2.16.840.1.113883.10.20.22.2.2", "2.16.840.1.113883.10.20.22.2.2.1"])
 .fields([
   ["immunizationsGiven","0..*", ImmunizationActivity.xpath(), ImmunizationActivity],

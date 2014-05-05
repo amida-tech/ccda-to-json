@@ -54,7 +54,7 @@ var ProblemOrganizer = Component.define("ProblemOrganizer")
 });
 
 
-var ProblemsSection = exports.ProblemsSection = Component.define("ProblemsSection")
+exports.ProblemsSection = Component.define("ProblemsSection")
 .templateRoot("2.16.840.1.113883.10.20.22.2.5.1") // coded entries required
 .fields([
   ["problemConcerns","0..*", ProblemOrganizer.xpath(), ProblemOrganizer],

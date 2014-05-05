@@ -13,7 +13,6 @@ Cleanup.clearNulls = function(){
   }
 
   if ('object' === typeof this.js) {
-    var self = this;
     Object.keys(this.js).forEach(function(k) {
       if ((this.js[k] === null) || 
           Array.isArray(this.js[k]) && (this.js[k].length === 0 || this.js[k].filter(function(v){return v &&  v.js !== null;}).length === 0) || 
