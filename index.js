@@ -16,7 +16,7 @@ var getXMLToJSONer = function(xmlType) {
     if (xmlType) {
         return xmlToJSONers[xmlType];
     } else {
-        return xmlToJSONers['ccd'];
+        return xmlToJSONers.ccd;
     }
 };
 
@@ -28,7 +28,7 @@ module.exports = function(src, options, callback) {
 
     if (options.hideFields){
         Component.cleanupStep(Cleanup.hideFields(options.hideFields), "paredown");
-    };
+    }
     
     var patientId = options.patientId || 0;
     var xml = common.parseXml(src);
