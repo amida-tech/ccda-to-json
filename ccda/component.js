@@ -133,6 +133,41 @@ Component.uriBuilder = function(p){
   return this;
 };
 
+Component.document = function(obj) {
+    var name = this.componentName;
+    if (! obj) {
+        obj = {};
+    } else if (obj.hasOwnProperty(name)) {
+        return obj;
+    }
+    var r = {};
+    obj[name] = r;
+    this.parsers.forEach(function(p){
+        var key = p.jsPath;
+        var parserComponent = p.component;
+        if (Component.isPrototypeOf(parserComponent)) {
+            parserComponent.document(obj);
+            if (p.multiple) {
+                r[key] = [parserComponent.componentName];
+            } else {
+                r[key] = parserComponent.componentName;
+            }
+        } else {
+            var type = null;
+            if (parserComponent && parserComponent.type) {
+                type = parserComponent.type;
+            } else {
+                type = 'string';
+            }
+            if (p.multiple) {
+                r[key] = {type: type, required: p.required};
+            } else {
+                r[key] = [{type: type, required: p.required}];
+            }
+        }
+    });
+    return obj;
+};
 
 Component
 .withNegationStatus(false)

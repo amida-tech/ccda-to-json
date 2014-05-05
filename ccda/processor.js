@@ -2,8 +2,8 @@ var XDate = require("xdate");
 var xpath = require("./common").xpath; 
 var Processor = module.exports = {};
 
-Processor.asString = function(v){
-  var ret;
+var asString = Processor.asString = function(v){
+  var ret = null;
 
   if (v.text){
     if (typeof v.text === "string") ret = v.text;
@@ -23,16 +23,22 @@ Processor.asString = function(v){
   return ret;
 };
 
-Processor.asBoolean = function(v){
+asString.type = 'string';
+
+var asBoolean = Processor.asBoolean = function(v){
   var t = Processor.asString(v);
   return t==='true';
 };
 
-Processor.asFloat = function(v){
+asBoolean.type = 'boolean';
+
+var asFloat = Processor.asFloat = function(v){
   return parseFloat(Processor.asString(v));
 };
 
-Processor.asTimestamp = function(v){
+asFloat.type = 'number';
+
+var asTimestamp = Processor.asTimestamp = function(v){
   var t = Processor.asString(v);
 
   var ret = new XDate(0,0,1,0,0,0,0, true); // UTC mode
@@ -52,7 +58,9 @@ Processor.asTimestamp = function(v){
   return ret.toDate();
 };
 
-Processor.asTimestampResolution =  function(v){
+asTimestamp.type = 'timedate';
+
+var asTimestampResolution = Processor.asTimestampResolution =  function(v){
   var t = Processor.asString(v);
   // TODO handle timezones in dates like 
   // Error: unexpected timestamp length 19540323000000.000-0600:23
@@ -73,9 +81,13 @@ Processor.asTimestampResolution =  function(v){
   return 'subsecond';
 };
 
-Processor.pathExists = function(p) {
+asTimestampResolution.type = 'string';
+
+var pathExists = Processor.pathExists = function(p) {
   return function(v){
     var m = xpath(v,p);
     return (m.length > 0); 
   };
 };
+
+pathExists.type = 'boolean';
