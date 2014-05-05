@@ -36,18 +36,18 @@ var getFormatter = function(name) {
 module.exports = function(options, callback) {
     var component = getComponent(options.component);
     if (! component) {
-        var msg = util.format('Unrecognized component: %s', options.component);
-        callback(new Error(msg));
+        var msg1 = util.format('Unrecognized component: %s', options.component);
+        callback(new Error(msg1));
     }
     var filepath = options.filepath;
     if (! filepath) {
-        var msg = 'No output file is specified.';
-        callback(new Error(msg));
+        var msg2 = 'No output file is specified.';
+        callback(new Error(msg2));
     }
     var formatter = getFormatter(options.formatter);
     if (! formatter) {
-        var msg = util.format('Unrecognized formatter: %s', options.formatter);
-        callback(new Error(msg));
+        var msg3 = util.format('Unrecognized formatter: %s', options.formatter);
+        callback(new Error(msg3));
     }
     
     var json = component.document();
