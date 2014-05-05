@@ -37,9 +37,6 @@ Component.define = function(name){
   subcomponent.__proto__ = this;
   subcomponent.classInit(name);
 
-  // instance-level super_ (shortcut for this.constructor.super_.prototype)
-  subcomponent.prototype.super_ = this.prototype;
-
   return subcomponent;
 };
 
