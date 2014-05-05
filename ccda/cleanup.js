@@ -3,6 +3,7 @@ var common = require("./common");
 var Processor = require("./processor");
 var OIDs = require("./oids");
 var _ = require("underscore");
+var ComponentInstance = require("./componentInstance");
 
 var Cleanup = module.exports = {};
 
@@ -156,7 +157,6 @@ Cleanup.ensureMutuallyExclusive = function(ps){
 };
 
 Cleanup.remapUris = function(uriMap) {
-  var Component = require("./component");
   var m = uriMap[this.js._id].matches;
   this.js._id = m && m[0] && m[0]._id || this.js._id;
   Cleanup.fixSectionUris.call(this);
